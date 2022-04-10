@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import './CatDetails.css'
 
 // Services
-
+import { getOne, assocToy } from '../../services/cats'
 
 // Components
 import Feedings from './components/Feedings'
@@ -16,9 +16,22 @@ const CatDetails = ({ catImages, user }) => {
   const [availableToys, setAvailableToys] = useState([])
   const idx = Math.floor(Math.random() * (catImages.length))
 
-  const addToCollection = async (e) => {}
+  const addToCollection = async (e) => {
+    e.preventDefault()
+    const toyId = parseInt(e.target.id)
+    const updatedCat = await assocToy(cat.id, toyId)
+    setAvailableToys(availableToys.filter(toy => toyId !== toy.id))
+    setCat({...updatedCat, fed: cat.fed})
+  }
 
-  useEffect(() => {}, [id])
+  useEffect(() => {
+    const fetchOne = async () => {
+      const data = await getOne(id)
+      setCat(data.cat)
+      setAvailableToys(data.available_toys)
+    }
+    fetchOne()
+  }, [id])
 
   if (!cat) return <h1>Loading</h1>
 
